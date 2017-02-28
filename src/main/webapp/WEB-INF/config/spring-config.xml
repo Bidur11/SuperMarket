@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+      http://www.springframework.org/schema/beans 
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+ 	  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+      http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+	<context:component-scan
+		base-package="com.mum.market.user.service,com.mum.market.products.service" />
+	<context:component-scan
+		base-package="com.mum.market.user.repository,com.mum.market.products.repository" />
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+
+
+	<!-- The jpa:repositories scans for all interfaces that extend Repository 
+		and creates implementations for use at runtime. -->
+	<jpa:repositories
+		base-package="com.mum.market.user.repository,com.mum.market.products.repository" />
+
+
+	<!-- Creates a JPA EntityManagerFactory according to JPA's standard container 
+		bootstrap contract. This is the most powerful way to set up a shared JPA 
+		EntityManagerFactory in a Spring application context; -->
+	<bean id="entityManager"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan"
+			value="com.mum.market.user.domain,com.mum.market.products.domain" />
+
+		<!-- provider-specific initialization,etc. -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+		</property>
+		<property name="jpaProperties">
+			<props>
+				
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.import_files">market.sql</prop>
+				
+			</props>
+		</property>
+	</bean>
+
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/market?createDatabaseIfNotExist=true" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManager" />
+	</bean>
+
+</beans>
+
+
